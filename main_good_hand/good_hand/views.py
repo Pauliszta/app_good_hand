@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 from django.views import View
 from django.db.models import Count
 from .models import Donation, Institution
@@ -30,8 +31,17 @@ class AddDonation(View):
         return render(request, "form.html")
 
 
-class LoginView(View):
-    def get(self, request):
+def user_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("/")
+        else:
+            return render(request, "register.html")
+    else:
         return render(request, "login.html")
 
 
